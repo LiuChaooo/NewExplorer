@@ -4,8 +4,8 @@ __version__ = '$Rev$'
 __doc__ = """  """
 
 from enum import Enum
-from config import codes
-from server import *
+from . import codes
+from .server import *
 
 # Proxy settings
 USE_X_FORWARDED_HOST = True

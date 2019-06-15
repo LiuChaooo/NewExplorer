@@ -19,14 +19,15 @@ def uni_str(a, encoding=None):
             key, value = k
             s[uni_str(key, encoding)] = uni_str(value, encoding)
         return s
-    elif isinstance(a, unicode):
-        return a
+    # elif isinstance(a, unicode):
+    #     return a
     elif isinstance(a, (int, float)):
         return a
     elif isinstance(a, str) or (hasattr(a, '__str__') and callable(getattr(a, '__str__'))):
         if getattr(a, '__str__'):
             a = str(a)
-        return unicode(a, encoding)
+        # return unicode(a, encoding)
+        return a
     else:
         return a
 
@@ -37,6 +38,6 @@ def detect_code(content):
         if encoding == 'GB2312':
             encoding = 'GBK'
         return encoding
-    except Exception, inst:
-        print "detect_code", inst
+    except Exception as inst:
+        print("detect_code", inst)
         return 'UTF-8'

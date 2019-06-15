@@ -51,9 +51,9 @@ class Provider(object):
             final_result = {
                 'blockhash': result['hash'],
                 'previousblockhash': result['parentHash'],
-                'height': long(result['number'], 0),
-                'time': long(result['timestamp'], 0),
-                'size': long(result['size'], 0),
+                'height': float(result['number'], 0),
+                'time': float(result['timestamp'], 0),
+                'size': float(result['size'], 0),
                 'nonce': result['nonce'],
                 'tx': [],
                 'transactions': transactions,
@@ -64,7 +64,7 @@ class Provider(object):
             # empty the tx field
             final_result['tx'] = []
             return final_result
-        except Exception, inst:
+        except Exception as inst:
             logger.exception("fail to parse_block_info:%s" % str(inst))
             return ''
 
@@ -102,12 +102,12 @@ class Provider(object):
         }
         final_result['from_address'] = response['from']
         final_result['to_address'] = response['to']
-        final_result['value'] = str(long(response['value'], 0))
-        final_result['fees'] = long(response['gas'], 0)
-        final_result['fees_price'] = long(response['gasPrice'], 0)
+        final_result['value'] = str(float(response['value'], 0))
+        final_result['fees'] = float(response['gas'], 0)
+        final_result['fees_price'] = float(response['gasPrice'], 0)
         final_result['data'] = response['input']
         final_result['transaction_index'] = int(response['transactionIndex'], 0)
-        final_result['height'] = long(response['blockNumber'], 0)
+        final_result['height'] = float(response['blockNumber'], 0)
         final_result['blockhash'] = response['blockHash']
         return final_result
 
@@ -120,9 +120,9 @@ class Provider(object):
         final_result['blockhash'] = response['blockHash']
         final_result['contract_address'] = response['contractAddress']
         final_result['transaction_status'] = response['status']
-        final_result['height'] = long(response['blockNumber'], 0)
-        final_result['fees_used'] = long(response['gasUsed'], 0)
-        final_result['cumulative_fees_used'] = long(response['cumulativeGasUsed'], 0)
+        final_result['height'] = float(response['blockNumber'], 0)
+        final_result['fees_used'] = float(response['gasUsed'], 0)
+        final_result['cumulative_fees_used'] = float(response['cumulativeGasUsed'], 0)
         return final_result
 
     def get_transaction_by_hash(self, hash_key):
@@ -138,7 +138,7 @@ class Provider(object):
 
     def get_balance_by_address(self, address):
         response = self._post('eth_getBalance', [address, "latest"])
-        result = str(long(response['result'], 0))
+        result = str(float(response['result'], 0))
         return result
 
     def send_transaction(self, rawtx):
@@ -167,25 +167,25 @@ class Provider(object):
             else:
                 logger.error('get validator error! block_info result:%s' % block_info)
                 return ''
-        except Exception, inst:
+        except Exception as inst:
             logger.exception("fail to get validator:%s" % str(inst))
             return ''
 
-if __name__ == '__main__':
-    url = 'http://explorer.newtonproject.dev.diynova.com:8501'
-    provider = Provider(url)
-    # get block height
-    print provider.get_block_height()
-    address_str = "0xe33eb7666bba40eccca84cf7a8d623735fa566d5"
-    balance = provider.get_balance_by_address(address_str)
-    print "balance %s" % str(balance)
-    # get block by height
-    # print provider.get_block_height(1)
-    # get transaction count 
-    print provider.get_transaction_count_by_height(1)
-    # get transaction by height and index
-    # print provider.get_transaction_by_height_and_index(2, 0)
-    # get block by hash
-    # get transaction by hash
-    # get utxos by address
-    # get balance by address
+# if __name__ == '__main__':
+#     url = 'http://explorer.newtonproject.dev.diynova.com:8501'
+#     provider = Provider(url)
+#     # get block height
+#     print provider.get_block_height()
+#     address_str = "0xe33eb7666bba40eccca84cf7a8d623735fa566d5"
+#     balance = provider.get_balance_by_address(address_str)
+#     print "balance %s" % str(balance)
+#     # get block by height
+#     # print provider.get_block_height(1)
+#     # get transaction count
+#     print provider.get_transaction_count_by_height(1)
+#     # get transaction by height and index
+#     # print provider.get_transaction_by_height_and_index(2, 0)
+#     # get block by hash
+#     # get transaction by hash
+#     # get utxos by address
+#     # get balance by address

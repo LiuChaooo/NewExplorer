@@ -3,7 +3,7 @@
 Django settings for lubangame  project.
 
 """
-from config import codes
+from . import codes
 
 # message content
 from django.utils.translation import ugettext_lazy as _

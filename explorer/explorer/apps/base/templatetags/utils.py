@@ -5,18 +5,19 @@ __doc__ = """ """
 
 import re
 import datetime
+import logging
 from django import template
 from django.conf import settings
 from django.utils.translation import ugettext
 from django.utils.translation import ungettext as _
-from sorl.thumbnail import get_thumbnail
 from django.utils.safestring import mark_safe
 from django.utils.timezone import utc
 
-from config import codes
+from explorer.config import codes
 
 register = template.Library()
 version_pattern = re.compile(r"^(.*)\.(.*?)$")
+logger = logging.getLogger(__name__)
 
 def version(path_string=''):
     """
@@ -227,7 +228,7 @@ def show_copy_right_time():
     try:
         n = datetime.datetime.now()
         return n.strftime('%Y')
-    except Exception, inst:
+    except Exception as inst:
         logger.exception("fail to show_copy_right_time:%s" % str(inst))
         return ""
 

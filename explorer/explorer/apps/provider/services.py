@@ -10,17 +10,12 @@ import logging
 import threading
 import math
 
-from mongoengine import connect
 from django.conf import settings
-from django.core.cache import cache
-from config import codes
-import provider_newton
-from provider import models as provider_models
+from explorer.config import codes
+from . import provider_newton
+from . import models as provider_models
 from decimal import *
-import job
-import binascii
-from mongoengine.queryset.visitor import Q
-
+from . import job
 
 DECIMAL_SATOSHI = Decimal("100000000")
 CONFIRM_BLOCKS = 6
@@ -45,8 +40,8 @@ def get_current_height(blockchain_type=codes.BlockChainType.NEWTON.value):
         if not obj:
             return -1
         return obj['height']
-    except Exception, inst:
-        print "inst:", inst
+    except Exception as inst:
+        print("inst:", inst)
         return -1
 
 def get_current_blockhash(blockchain_type=codes.BlockChainType.NEWTON.value):
@@ -56,16 +51,16 @@ def get_current_blockhash(blockchain_type=codes.BlockChainType.NEWTON.value):
             return ''
         obj = provider_models.Block.objects.get(height=height)
         return obj.blockhash
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         return ""
 
 def get_block_hash_by_height(height, blockchain_type=codes.BlockChainType.NEWTON.value):
     try:
         obj = provider_models.Block.objects.get(height=height)
         return obj.blockhash
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         return ''
 
 def store_block_data(provider, block_info, blockchain_type=codes.BlockChainType.NEWTON.value, is_fast_sync=True):
@@ -99,8 +94,8 @@ def store_block_data(provider, block_info, blockchain_type=codes.BlockChainType.
         block_instance['validator'] = ''
         block_instance.save()
         return True
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to store block data:%s, block_info:%s" % (str(inst), block_info))
         return False
 
@@ -116,7 +111,7 @@ def sync_validator_data(provider, block_info, name="", url=""):
             instance.name = name
             instance.url = url
             instance.save()
-    except Exception, inst:
+    except Exception as inst:
         logger.exception("fail to sync validator data:%s" % str(inst))
 
 
@@ -155,8 +150,8 @@ def save_block_data(provider, block_info, sync_type=codes.SyncType.SYNC_PROGRAM.
             stats.contracts_number += contracts_number
             stats.save()
         return True
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to save block data:%s, block_info:%s" % (str(inst), block_info))
         return False
 
@@ -170,7 +165,7 @@ def init_transaction_cache():
     try:
         provider_models.CappedTransaction.drop_collection()
         return True
-    except Exception, inst:
+    except Exception as inst:
         logger.exception("fail to initialize transaction cache:%s" % str(inst))
         return False
 
@@ -192,7 +187,7 @@ def insert_transactions_to_cache(transactions):
             items.append(capped_instance)
         provider_models.CappedTransaction.objects.insert(items)
         return True
-    except Exception, inst:
+    except Exception as inst:
         # reset the capped collection
         try:
             init_transaction_cache()
@@ -222,7 +217,7 @@ def sync_account_data(provider, address_list, address_dict, sync_type=codes.Sync
             elif sync_type == codes.SyncType.FILL_MISSING_PROGRAM.value:
                 instance.missing_transactions_number += address_dict[address]
             instance.save()
-    except Exception, inst:
+    except Exception as inst:
         logger.exception("fail to sync account data:%s" % str(inst))
 
 
@@ -267,8 +262,8 @@ def save_transaction_data(provider, block_info, sync_type=codes.SyncType.SYNC_PR
                 address_dict[address] = address_list.count(address)
             sync_account_data(provider, list(set(address_list)), address_dict, sync_type)
         return True, contracts_number
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to save transaction data:%s" % (str(inst)))
         return False, 0
 
@@ -282,8 +277,8 @@ def sync_contract_data(receipt_data, time):
         contract_instance.creator = receipt_data['from_address']
         contract_instance.time = time
         contract_instance.save()
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception('fail to sync contract data:%s' % (str(inst)))
         return False
 
@@ -310,8 +305,8 @@ def sync_address_data(transaction_instance):
             from_addr_obj.txid = transaction_instance.txid
             from_addr_obj.time = transaction_instance.time
             from_addr_obj.save()
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception('fail to save address data:%s' % (str(inst)))
         return False
 
@@ -334,8 +329,8 @@ def handle_block_fork(blockchain_type):
         sync_blockchain(url_prefix, blockchain_type=blockchain_type, from_height=target_height)
         logger.info("handle block fork successfully.")
         return True
-    except Exception, inst:
-        print "fail to handle block fork:", str(inst)
+    except Exception as inst:
+        print("fail to handle block fork:", str(inst))
         logger.exception("fail to handle block fork: %s" % str(inst))
         return False
 
@@ -349,8 +344,8 @@ def sync_block_rawdata(data, blockchain_type=codes.BlockChainType.NEWTON.value):
         status = store_block_data(block_info)
         if not status:
             handle_block_fork(blockchain_type)
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to sync block raw data:%s" % str(inst))
 
 
@@ -382,8 +377,8 @@ def sync_blockchain(url_prefix, blockchain_type=codes.BlockChainType.NEWTON.valu
                     contracts_number = status[1]
                     save_block_data(provider, data, sync_type=sync_type, contracts_number=contracts_number)
             logger.info("sync_blockchain:height:%s" % tmp_height)
-    except Exception, inst:
-        print "fail to sync blockchain", inst
+    except Exception as inst:
+        print("fail to sync blockchain", inst)
         logger.exception("fail to sync blockchain:%s" % str(inst))
 
 
@@ -426,9 +421,9 @@ def fast_sync_blockchain(url_prefix, blockchain_type=codes.BlockChainType.NEWTON
                     is_all_close = False
             if is_all_close:
                 break
-        print "sync successfully."
-    except Exception, inst:
-        print "fail to fast sync blockchain", inst
+        print("sync successfully.")
+    except Exception as inst:
+        print("fail to fast sync blockchain", inst)
         logger.exception("fail to fast sync blockchain:%s" % str(inst))
 
 
@@ -443,7 +438,7 @@ def fill_missing_block(url_prefix, blockchain_type=codes.BlockChainType.NEWTON.v
         if current_height == -1:
             start_height = 0
         if start_height > current_height or end_height > current_height:
-            print "error: start_height > current_height"
+            print("error: start_height > current_height")
             return
         if end_height == 0:
             end_height = current_height
@@ -462,8 +457,8 @@ def fill_missing_block(url_prefix, blockchain_type=codes.BlockChainType.NEWTON.v
                         contracts_number = status[1]
                         save_block_data(provider, data, sync_type=sync_type, contracts_number=contracts_number)
                         logger.info("sync missing block:%s" % tmp_height)
-    except Exception, inst:
-        print "fail to fill missing block", inst
+    except Exception as inst:
+        print("fail to fill missing block", inst)
         logger.exception("fail to fill missing block:%s" % str(inst))
 
 
@@ -478,7 +473,7 @@ def reindex_block(url_prefix, blockchain_type=codes.BlockChainType.NEWTON.value,
         if current_height == -1:
             start_height = 0
         if start_height > current_height or end_height > current_height:
-            print "error: start_height > current_height"
+            print("error: start_height > current_height")
             return
         if end_height == 0:
             end_height = current_height
@@ -494,7 +489,7 @@ def reindex_block(url_prefix, blockchain_type=codes.BlockChainType.NEWTON.value,
                     contracts_number = status[1]
                     save_block_data(provider, data, sync_type=sync_type, contracts_number=contracts_number)
                     logger.info("reindex block:%s" % tmp_height)
-    except Exception, inst:
+    except Exception as inst:
         logger.exception("fail to reindexing block:%s" % str(inst))
 
 
@@ -506,8 +501,8 @@ def send_transaction(rawtx, blockchain_type=codes.BlockChainType.NEWTON.value):
         url_prefix = settings.FULL_NODES['new']['rest_url']
         provider = blockchain_providers[blockchain_type].Provider(url_prefix)
         return provider.send_transaction(rawtx)
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to send transaction:%s" % str(inst))
         return None
 
@@ -519,8 +514,8 @@ def get_transaction_pool(blockchain_type=codes.BlockChainType.NEWTON.value):
         url_prefix = settings.FULL_NODES['new']['rest_url']
         provider = blockchain_providers[blockchain_type].Provider(url_prefix)
         return provider.get_transaction_pool()
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to get transaction list in memory pool:%s" % str(inst))
         return []
 
@@ -531,8 +526,8 @@ def parse_transaction_message(data, blockchain_type=codes.BlockChainType.NEWTON.
     try:
         provider = blockchain_providers[blockchain_type].Provider('')
         return provider.parse_transaction_response(data)
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to parse transaction message:%s" % str(inst))
         return None
 
@@ -543,7 +538,7 @@ def totalize_account_transactions():
     try:
         account_objs = provider_models.Account.objects.filter()
         for account in account_objs:
-            print "caculate address:", account.address
+            print("caculate address:", account.address)
             if account.transactions_number:
                 continue
             tx_number = provider_models.Address.objects.filter(address=account.address).count()
@@ -558,7 +553,7 @@ def totalize_account_transactions():
         stats.transactions_number = txs_number
         stats.contracts_number = contracts_number
         stats.save()
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to totalize account transactions:%s" % str(inst))
         return None

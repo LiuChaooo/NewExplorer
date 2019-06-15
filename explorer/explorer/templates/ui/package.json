@@ -29,7 +29,7 @@
   "dependencies": {},
   "devDependencies": {
     "bower": "~1.8.0",
-    "grunt": "^1.0.3",
+    "grunt": "^1.0.4",
     "grunt-angular-gettext": "^2.3.10",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-concat": "~0.3.0",

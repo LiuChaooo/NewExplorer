@@ -14,7 +14,7 @@ BASE_NAME = 'explorer'
 
 # domain settings
 DEBUG = True
-TEMPLATE_DEBUG = False
+TEMPLATE_DEBUG = True
 THUMBNAIL_DEBUG = False
 DOMAIN = 'explorer.test.newtonproject.org'
 BASE_URL = 'http://explorer.test.newtonproject.org'
@@ -40,7 +40,7 @@ else:
     raise Exception('Upsupport platform!')
 
 from logging.handlers import SysLogHandler
-LOGGING_LEVEL = 'DEBUG'
+LOGGING_LEVEL = 'INFO'
 LOGGING_LEVEL_SENTRY = 'ERROR'
 LOGGING = {
     'version': 1,

@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import sys
-
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -89,7 +88,22 @@ LOCALE_PATHS = (
 )
 
 # Template root directory
-TEMPLATE_DIRS = [os.path.join(PROJECT_ROOT, "templates")]
+# TEMPLATE_DIRS = [os.path.join(PROJECT_ROOT, "templates")]
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR+"/explorer/templates"],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 try:
     from .settings_local import *

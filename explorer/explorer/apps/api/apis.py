@@ -12,12 +12,12 @@ from decimal import *
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
-from config import codes
-from utils import http
-from provider import models as provider_models
-from provider import services as provider_services
+from explorer.config import codes
+from explorer.utils import http
+from explorer.apps.provider import models as provider_models
+from explorer.apps.provider import services as provider_services
 DECIMAL_SATOSHI = Decimal("1000000000000000000")
-from utils import newchain_tools
+from explorer.utils import newchain_tools
 import datetime
 from mongoengine.queryset.visitor import Q
 
@@ -90,7 +90,7 @@ def api_get_ip(request, version):
     return http.JsonSuccessResponse({'ip': ip})
 
 def api_get_peer(request,version):
-    return http.JsonResponse({"connected":true,"host":"127.0.0.1","port":""})
+    return http.JsonResponse({"connected":True,"host":"127.0.0.1","port":""})
 
 def api_show_version(request, version):
     """Show the api version for uri: /version
@@ -114,8 +114,8 @@ def api_get_sync(request, version):
             "syncedBlocks": current_height,
             }
         return http.JsonResponse(result)
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to get sync:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -243,24 +243,24 @@ def api_show_blocks(request, version):
             }
         }
         return http.JsonResponse(result)
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to show blocks:%s" % str(inst))
         return http.HttpResponseServerError()
 
 def api_show_block_info_by_height(request, version, height):
     """Show the block info by height for uri: /block-index/<height>
-    
+
     """
     try:
         height = int(height)
         obj = provider_models.Block.objects.get(height=height)
         return http.JsonResponse({'blockHash': obj.id})
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to show block info by height:%s" % str(inst))
         return http.HttpResponseServerError()
-    
+
 def api_show_block_info(request, version, blockhash):
     """Show the block info by block hash key for uri: /block/<hash>
 
@@ -297,8 +297,8 @@ def api_show_block_info(request, version, blockhash):
         result['validator_name'] = validator_name
         result['validator_url'] = validator_url
         return http.JsonResponse(result)
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to show block info by hash:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -329,7 +329,7 @@ def api_show_transactions(request, version):
                         "sequence": 4294967295
                     },],
                 "vout": [
-                    {   
+                    {
                        "n": 0,
                        "scriptPubKey": {
                            "addresses": ["muqq4M9KHTf1kVHWiciLirMybfy22gEA1K"],
@@ -338,7 +338,7 @@ def api_show_transactions(request, version):
                            "type": "pubkeyhash"
                        },
                        "value": "50.00000000"},]
-            },      
+            },
         ]
     }
     """
@@ -416,8 +416,8 @@ def api_show_transactions(request, version):
             "txs": txs
         }
         return http.JsonResponse(result)
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to show transactions:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -446,7 +446,7 @@ def api_show_transaction(request, version, txid):
             },
         ],
         "vout": [
-            {   
+            {
                 "n": 0,
                 "scriptPubKey": {
                     "addresses": ["muqq4M9KHTf1kVHWiciLirMybfy22gEA1K"],
@@ -487,8 +487,8 @@ def api_show_transaction(request, version, txid):
             return http.JsonResponse(result)
         else:
             return http.HttpResponseNotFound()
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to show transaction:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -530,8 +530,8 @@ def api_show_addr_summary(request, version, addr):
             return http.JsonResponse(result)
         else:
             return http.HttpResponseNotFound()
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to show transaction:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -589,8 +589,8 @@ def api_show_transactions_by_addresses(request, version, addrs=None):
         result['totalItems'] = len(items)
         result['items'] = items
         return http.JsonResponse(result)
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to show transactions by addresses:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -618,8 +618,8 @@ def api_send_transcation(request, version):
         if not txid:
             raise Exception("return txid is null")
         return http.JsonResponse({'txid': txid})
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to send transaction:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -641,8 +641,8 @@ def api_show_newtx(request, version):
             item['value'] = value
             txs.append(item)
         return http.JsonResponse({'txs': txs})
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to show new transaction:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -666,8 +666,8 @@ def api_show_newblock(request, version):
             result['height'] = new_height
             return http.JsonResponse(result)
         return http.HttpResponseNotFound()
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to show new block:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -689,7 +689,7 @@ def api_get_estimatefee(request, version):
                 elif int(nbBlock) == 3:
                     result[nbBlock] = 30000 / 1e8
         return http.JsonResponse(result)
-    except Exception, inst:
+    except Exception as inst:
         return http.HttpResponseServerError()
 
 def api_show_client_transactions(request, version):
@@ -742,8 +742,8 @@ def api_show_client_transactions(request, version):
             "docs": txs
         }
         return http.JsonResponse(result)
-    except Exception, inst:
-        print inst
+    except Exception as inst:
+        print(inst)
         logger.exception("fail to show client transactions:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -764,7 +764,7 @@ def api_show_client_transaction(request, version):
             "tx": item
         }
         return http.JsonResponse(result)
-    except Exception, inst:
+    except Exception as inst:
         logger.exception("fail to show client transaction:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -809,7 +809,7 @@ def api_show_contracts_list(request, version):
             'is_more': more
         }
         return http.JsonResponse(result)
-    except Exception, inst:
+    except Exception as inst:
         logger.exception("fail to show contract list:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -833,7 +833,7 @@ def api_show_contract(request, version, contractAddr):
             'contract': contract
         }
         return http.JsonResponse(result)
-    except Exception, inst:
+    except Exception as inst:
         logger.exception("fail to show contract:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -866,7 +866,7 @@ def api_for_dashboard(request):
             'tx': tx
         }
         return http.JsonResponse(result)
-    except Exception, inst:
+    except Exception as inst:
         logger.exception("fail to show dashboard data:%s" % str(inst))
         return http.HttpResponseServerError()
 
@@ -894,6 +894,6 @@ def api_home_brief(request, version):
             'contracts': contracts
         }
         return http.JsonResponse(result)
-    except Exception, inst:
+    except Exception as inst:
         logger.exception("fail to get home page brief:%s" % str(inst))
         return http.HttpResponseServerError()

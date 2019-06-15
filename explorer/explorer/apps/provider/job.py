@@ -37,8 +37,8 @@ class FastSyncThread(Thread):
                 if data:
                     self.storage_func(data, self.provider, is_fast_sync=True)
                     current_height += 1
-        except Exception, inst:
-            print inst
+        except Exception as inst:
+            print(inst)
             logger.exception('fail to exeucte fast sync thread: %s' % str(inst))
 
 
@@ -59,8 +59,8 @@ class SyncAccountThread(Thread):
                 value = self.provider.get_balance_by_address(address)
                 result[address] = value
             self.storage_func(result)
-        except Exception, inst:
-            print inst
+        except Exception as inst:
+            print(inst)
             logger.exception('fail to exeucte sync account thread: %s' % str(inst))
 
 
@@ -78,6 +78,6 @@ class SyncValidatorThread(Thread):
         try:
             logger.info("start the sync validator thread")
             self.storage_func(self.provider, self.validator_lib, self.block_info, self.name, self.url)
-        except Exception, inst:
-            print inst
+        except Exception as inst:
+            print(inst)
             logger.exception('fail to exeucte sync validator thread: %s' % str(inst))
