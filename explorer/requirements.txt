@@ -47,6 +47,6 @@ xlrd==1.0.0
 xlwt==1.1.2
 mongoengine==0.18.2
 eventlet==0.21.0
-flask==0.12.2
+flask==1.0
 python-socketio==1.8.4
 base58==1.0.0
