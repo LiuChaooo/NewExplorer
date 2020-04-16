@@ -67,7 +67,6 @@ Url prefix: `/api/v{version_number}`, current version number is `3`.
         
         | field | type | description |
         | --- | --- | --- |
-        
         | txid | string | transaction hash |
         | transaction_status | int | transaction status，0-fail 1-success 2-pending |
         | confirmations | string | confirm number |
